@@ -31,6 +31,7 @@ Yerel dosyalarla çalışan masaüstü Markdown okuyucu ve görsel düzenleyici.
 - [Geliştirme](#geliştirme)
 - [Testler](#testler)
 - [Paketleme](#paketleme)
+- [MCP sunucusu](#mcp-sunucusu)
 - [Veri güvenliği ve gizlilik](#veri-güvenliği-ve-gizlilik)
 - [Taşınabilir veri klasörü](#taşınabilir-veri-klasörü)
 - [Bilinen kullanım sınırları](#bilinen-kullanım-sınırları)
@@ -130,6 +131,40 @@ node scripts/release-metadata.mjs
 Diğer mimari için doğrudan `npx electron-builder --mac --x64 --publish never` gibi bir hedef kullanılır. Platform paketleri esas olarak kendi işletim sistemlerinde oluşturulmalıdır. GitHub Actions dosyası platform/mimari işleri içerir. `main` güncellemeleri, sürüm etiketleri ve elle başlatılan çalışmalar doğrulama ve paketleme akışını tetikler.
 
 İmzalama, noter onayı ve yayın adresi yönetimi için [yayınlama rehberini](docs/YAYINLAMA.md) okuyun.
+
+## MCP sunucusu
+
+Folio, yapay zekâ asistanlarının tek bir klasördeki Markdown dosyalarıyla uygulamanın güvenli kayıt kurallarını kullanarak çalışabilmesi için yerel bir [MCP](https://modelcontextprotocol.io) sunucusu içerir. Sunucu kaynak kodundan çalıştırılır ve uygulama paketlerine eklenmez.
+
+```bash
+npm ci
+npm run build:main
+node dist-electron/mcp.js /notlar/klasoru
+```
+
+Örnek istemci yapılandırması:
+
+```json
+{
+  "mcpServers": {
+    "folio": {
+      "command": "node",
+      "args": ["/yol/folio-markdown/dist-electron/mcp.js", "/notlar/klasoru"]
+    }
+  }
+}
+```
+
+| Araç               | Ne yapar                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------ |
+| `list_documents`   | Klasördeki Markdown dosyalarını boyutlarıyla listeler                                      |
+| `read_document`    | Bir dosyanın kaynağını, kodlamasını ve özetini döndürür                                    |
+| `search_documents` | Satır numaralarıyla düz metin araması yapar                                                |
+| `write_document`   | Yeni dosya oluşturur veya `baseHash` diskteki dosyayla eşleşirse mevcut dosyayı değiştirir |
+
+- Yalnız klasör içindeki `.md` ve `.markdown` dosyaları kullanılabilir. Dışarıyı gösteren yollar ve sembolik bağlantılar reddedilir.
+- Gizli klasörler, `node_modules`, `dist` ve `release` atlanır; 5 MiB üzerindeki dosyalar okunmaz.
+- Yazma işlemi atomiktir, dosyanın kodlamasını ve CRLF satır sonlarını korur ve okunduktan sonra değişmiş bir dosyanın üzerine yazmaz.
 
 ## Veri güvenliği ve gizlilik
 
