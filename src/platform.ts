@@ -72,7 +72,10 @@ const web: DesktopAPI = {
   },
   searchFolder: async () => ({ results: [], truncated: false }),
   replaceFiles: async () => [],
-  addAsset: async (_, data, name) => `data:image/${name.split('.').pop()};base64,${data}`,
+  addAsset: async (_, data, name) => {
+    const ext = name.split('.').pop()!.toLowerCase();
+    return `data:image/${{ jpg: 'jpeg', svg: 'svg+xml' }[ext] || ext};base64,${data}`;
+  },
   asset: async (_, reference) => {
     if (reference.startsWith('data:image/')) return reference;
     throw new Error('Tarayıcıda yerel görsel için masaüstü uygulamasını kullanın.');
