@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { atomicSave, hash, ConflictError, decode, inside } from '../electron/files';
+import { atomicSave, hash, ConflictError, decode, decodePath, inside } from '../electron/files';
 import iconv from 'iconv-lite';
 describe('safe file persistence', () => {
   it('atomically saves and rejects external edits without touching disk', async () => {
@@ -47,6 +47,10 @@ describe('safe file persistence', () => {
     expect(inside('/docs', '/docs/a.png')).toBe(true);
     expect(inside('/docs', '/docs-other/a.png')).toBe(false);
     expect(inside('/docs', '/secret')).toBe(false);
+  });
+  it('decodes link paths and keeps a literal percent sign', () => {
+    expect(decodePath('my%20image.png')).toBe('my image.png');
+    expect(decodePath('100%.png')).toBe('100%.png');
   });
   it('preserves UTF-16 BOM during a no-op save', async () => {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'folio-test-'));

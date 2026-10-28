@@ -4,6 +4,13 @@ import { getMermaid } from './core/mermaid';
 import { parse } from './core/markdown';
 
 const uuid = () => crypto.randomUUID();
+const decodePath = (value: string) => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
 function download(name: string, data: string | Uint8Array, type: string) {
   const blob = new Blob([data as BlobPart], { type });
   const url = URL.createObjectURL(blob);
@@ -203,10 +210,8 @@ export async function exportZip(name: string, source: string, documentId: string
     }
     try {
       const data = await api.asset(documentId, ref);
-      files[decodeURIComponent(ref)] = Uint8Array.from(atob(data.split(',')[1]), (c) =>
-        c.charCodeAt(0),
-      );
-      packageBytes += files[decodeURIComponent(ref)].length;
+      files[decodePath(ref)] = Uint8Array.from(atob(data.split(',')[1]), (c) => c.charCodeAt(0));
+      packageBytes += files[decodePath(ref)].length;
     } catch {
       missing.push(ref);
     }

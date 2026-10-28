@@ -3,15 +3,8 @@ import path from 'node:path';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
-import { hash, inside } from './files.js';
+import { decodePath, hash, inside } from './files.js';
 
-const decode = (value: string) => {
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
-};
 export async function relocateAssets(source: string, original: string, target: string) {
   const root = await fs.realpath(path.dirname(original)),
     destination = await fs.realpath(path.dirname(target));
@@ -34,7 +27,7 @@ export async function relocateAssets(source: string, original: string, target: s
     if (!next) {
       const fragment = node.url.includes('#') ? '#' + node.url.split('#').slice(1).join('#') : '';
       const reference = node.url.split('#')[0],
-        resolved = path.resolve(root, decode(reference));
+        resolved = path.resolve(root, decodePath(reference));
       const image = /\.(png|jpg|jpeg|webp|gif|svg)$/i.test(reference);
       if (image) {
         const real = await fs.realpath(resolved);
