@@ -38,6 +38,16 @@ Kurulu macOS/Windows paketinde electron-updater yapılandırması ve imzalı yay
 
 Kullanıcı indirme ve kurulum eylemlerini ayrı başlatır. Kurulum öncesinde açık belgelerin güvenle kaydedilmesi gerekir. Yayın adresinden farklı bir kaynağa yönlendiren indirmeler ağ izinleri nedeniyle reddedilebilir; CDN kullanılan kanallar ayrıca denetlenmelidir.
 
+## Sürüm yayınlama
+
+`.github/workflows/release.yml`, `main` dalında `package.json` değiştiğinde çalışır. `version` alanı için `v<sürüm>` etiketi yoksa altı platform/mimari paketini üretir, SHA256SUMS, SBOM ve lisans bildirimlerini ekler, ardından etiketi ve GitHub sürümünü oluşturur. Etiket zaten varsa hiçbir şey yayınlanmaz. `1.1.0-beta.1` gibi tireli sürümler ön sürüm olarak işaretlenir.
+
+1. `npm version <patch|minor|major> --no-git-tag-version` ile `package.json` ve `package-lock.json` sürümünü birlikte güncelleyin.
+2. Değişikliği bir pull request ile `main` dalına alın.
+3. Mevcut sürümü yeniden denemek için iş akışı Actions sekmesinden elle de başlatılabilir.
+
+Paketler imzasız üretilir ve sürüme `latest*.yml` güncelleme beslemeleri eklenmez; aynı adlı x64 ve ARM64 beslemeleri birbirinin üzerine yazacağı için bu dosyalar imzalı yayın yapılandırmasıyla birlikte ele alınmalıdır.
+
 ## CI ve meta veriler
 
 `.github/workflows/desktop.yml`, Windows/macOS/Linux ve x64/ARM64 işleri tanımlar. Kaynak depoya gönderilip ilgili işler çalıştırılmadan CI başarılı olarak raporlanamaz. Kontrol edilen [GitHub runner tablosu](https://docs.github.com/en/actions/reference/runners/github-hosted-runners) yapılandırılan mimarileri listeler; kullanılabilirlik ve hesap kotaları ayrıca geçerlidir.
