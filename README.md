@@ -31,6 +31,7 @@ Folio is a local-first desktop Markdown reader and visual editor built with Elec
 - [Development](#development)
 - [Testing](#testing)
 - [Packaging](#packaging)
+- [MCP server](#mcp-server)
 - [Data safety and privacy](#data-safety-and-privacy)
 - [Portable data folder](#portable-data-folder)
 - [Known limits](#known-limits)
@@ -130,6 +131,40 @@ node scripts/release-metadata.mjs
 For another architecture use a target such as `npx electron-builder --mac --x64 --publish never`. Packages should be built on their own operating system. The GitHub Actions workflow has jobs for each platform and architecture and runs on `main` pushes, version tags and manual runs.
 
 See the [release guide](docs/YAYINLAMA.md) (Turkish) for signing, notarization and update address setup.
+
+## MCP server
+
+Folio includes a local [MCP](https://modelcontextprotocol.io) server so AI assistants can work with the Markdown files in one folder using the same safe save rules as the app. It runs from a source checkout and is not part of the app packages.
+
+```bash
+npm ci
+npm run build:main
+node dist-electron/mcp.js /path/to/notes
+```
+
+Example client configuration:
+
+```json
+{
+  "mcpServers": {
+    "folio": {
+      "command": "node",
+      "args": ["/path/to/folio-markdown/dist-electron/mcp.js", "/path/to/notes"]
+    }
+  }
+}
+```
+
+| Tool               | What it does                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| `list_documents`   | Lists Markdown files in the folder with their sizes                                  |
+| `read_document`    | Returns the source, encoding and hash of one file                                    |
+| `search_documents` | Plain text search with line numbers                                                  |
+| `write_document`   | Creates a file, or replaces an existing one when `baseHash` matches the file on disk |
+
+- Only `.md` and `.markdown` files inside the folder are available. Paths and symbolic links that point outside are rejected.
+- Hidden folders, `node_modules`, `dist` and `release` are skipped, and files over 5 MiB are not read.
+- Writes are atomic, keep the file's encoding and CRLF line endings, and refuse to overwrite a file that changed after it was read.
 
 ## Data safety and privacy
 
