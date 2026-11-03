@@ -15,7 +15,7 @@ export function CSVDialog({
 
   const [bytes, setBytes] = useState<ArrayBuffer>(),
     [encoding, setEncoding] = useState('utf-8'),
-    [separator, setSeparator] = useState(file.name.endsWith('.tsv') ? '\t' : ','),
+    [separator, setSeparator] = useState(/\.tsv$/i.test(file.name) ? '\t' : ','),
     [header, setHeader] = useState(true);
   useEffect(() => {
     void file.arrayBuffer().then(setBytes);
