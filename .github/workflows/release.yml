@@ -1,0 +1,105 @@
+name: Release
+on:
+  push:
+    branches: [main]
+    paths: [package.json]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: release
+  cancel-in-progress: false
+jobs:
+  version:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      release: ${{ steps.check.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          version=$(node -p "require('./package.json').version")
+          lock=$(node -p "require('./package-lock.json').version")
+          if [ "$version" != "$lock" ]; then
+            echo "::error::package.json is $version but package-lock.json is $lock. Run npm install to sync them."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" > /dev/null; then
+            echo "v$version is already released, nothing to do."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+  build:
+    needs: version
+    if: needs.version.outputs.release == 'true'
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { os: macos-latest, platform: mac, arch: arm64 }
+          - { os: macos-15-intel, platform: mac, arch: x64 }
+          - { os: windows-latest, platform: win, arch: x64 }
+          - { os: windows-11-arm, platform: win, arch: arm64 }
+          - { os: ubuntu-24.04, platform: linux, arch: x64 }
+          - { os: ubuntu-24.04-arm, platform: linux, arch: arm64 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '24', cache: npm }
+      - run: npm ci
+      - run: node scripts/icons.mjs
+      - run: npm test
+      - run: npm run build
+      - run: node scripts/release-metadata.mjs
+      - name: Build packages
+        if: runner.os != 'Linux'
+        run: npx electron-builder --${{ matrix.platform }} --${{ matrix.arch }} --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Build Linux packages with bundled offline documentation
+        if: runner.os == 'Linux'
+        run: npx electron-builder --linux --${{ matrix.arch }} --publish never --config.extraMetadata.homepage=file:///opt/Folio/resources/README.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            release/*.dmg
+            release/*.zip
+            release/*.exe
+            release/*.AppImage
+            release/*.deb
+          if-no-files-found: error
+          retention-days: 7
+  release:
+    needs: [version, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '24', cache: npm }
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: release
+          merge-multiple: true
+      - name: Generate checksums, SBOM and license notices
+        run: node scripts/release-metadata.mjs
+      - name: Create tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          flags=()
+          if [[ "$VERSION" == *-* ]]; then flags+=(--prerelease); fi
+          gh release create "v$VERSION" release/* \
+            --target "$GITHUB_SHA" \
+            --title "Folio $VERSION" \
+            --generate-notes \
+            "${flags[@]}"
