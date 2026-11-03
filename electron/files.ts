@@ -78,6 +78,14 @@ export async function atomicSave(
     await fs.unlink(temp).catch(() => {});
   }
 }
+// Markdown paths may contain a literal % that is not a valid escape, so fall back to the raw value.
+export const decodePath = (value: string) => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
 export const inside = (root: string, file: string) => {
   const rel = path.relative(root, file);
   return !rel.startsWith('..' + path.sep) && rel !== '..' && !path.isAbsolute(rel);

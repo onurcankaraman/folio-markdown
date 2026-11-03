@@ -5,7 +5,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { atomicSave, ConflictError, decode, hash, inside } from './files.js';
+import { atomicSave, ConflictError, decode, decodePath, hash, inside } from './files.js';
 import { relocateAssets } from './assets.js';
 import updater from 'electron-updater';
 import { parse as parseYAML } from 'yaml';
@@ -259,7 +259,7 @@ function handlers() {
     const full = await fs.realpath(
       reference.startsWith('file:')
         ? fileURLToPath(reference)
-        : path.resolve(path.dirname(original), decodeURIComponent(reference)),
+        : path.resolve(path.dirname(original), decodePath(reference)),
     );
     if (!inside(path.dirname(original), full)) {
       const choice = await dialog.showMessageBox(win, {
@@ -843,7 +843,7 @@ function handlers() {
       ref = z.string().max(4096).parse(reference);
     if (/^[a-z]+:|^\/\//i.test(ref)) throw new Error('Harici görsel için izin gerekli.');
     const root = path.dirname(doc),
-      full = await fs.realpath(path.resolve(root, decodeURIComponent(ref)));
+      full = await fs.realpath(path.resolve(root, decodePath(ref)));
     if (!inside(root, full)) throw new Error('ACCESS_DENIED: Görsel belge klasörünün dışında.');
     const stat = await fs.stat(full);
     if (stat.size > 25 * 1024 * 1024) throw new Error('Görsel 25 MiB sınırını aşıyor.');
