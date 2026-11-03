@@ -137,12 +137,14 @@ function toEditor(n: any, source: string): JSONContent {
         attrs: n.ordered ? { start: n.start || 1 } : {},
         content: kids(),
       };
-    case 'listItem':
+    case 'listItem': {
+      const content = kids();
       return {
         type: typeof n.checked === 'boolean' ? 'taskItem' : 'listItem',
         ...(typeof n.checked === 'boolean' ? { attrs: { checked: n.checked } } : {}),
-        content: kids().length ? kids() : [paragraph()],
+        content: content.length ? content : [paragraph()],
       };
+    }
     case 'thematicBreak':
       return { type: 'horizontalRule' };
     case 'code':
