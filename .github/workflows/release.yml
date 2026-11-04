@@ -53,7 +53,12 @@ jobs:
       - run: npm ci
       - run: node scripts/icons.mjs
       - run: npm test
+      - run: npx playwright install --with-deps chromium
       - run: npm run build
+      - if: runner.os != 'Linux'
+        run: npx playwright test
+      - if: runner.os == 'Linux'
+        run: xvfb-run -a npx playwright test
       - run: node scripts/release-metadata.mjs
       - name: Build packages
         if: runner.os != 'Linux'
@@ -98,8 +103,10 @@ jobs:
         run: |
           flags=()
           if [[ "$VERSION" == *-* ]]; then flags+=(--prerelease); fi
+          notes=(--generate-notes)
+          if [[ -f "docs/releases/v$VERSION.md" ]]; then notes=(--notes-file "docs/releases/v$VERSION.md"); fi
           gh release create "v$VERSION" release/* \
             --target "$GITHUB_SHA" \
             --title "Folio $VERSION" \
-            --generate-notes \
+            "${notes[@]}" \
             "${flags[@]}"

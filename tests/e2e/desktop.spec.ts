@@ -25,6 +25,27 @@ test('native desktop opens real files, saves atomically and rejects stale writes
     await expect(page.locator('.document-scroll h1:visible')).toHaveText('Masaüstü');
     const native = await page.evaluate(() => !!window.desktop);
     expect(native).toBe(true);
+    // Exercise real Electron wheel delivery, not just a synthetic DOM event.
+    const viewport = await page.locator('.document-scroll').boundingBox();
+    const paperWidth = await page
+      .locator('.document-sheet')
+      .evaluate((el) => el.getBoundingClientRect().width);
+    await page.mouse.move(viewport!.x + viewport!.width / 2, viewport!.y + 150);
+    await page.keyboard.down('Control');
+    await page.mouse.wheel(0, -60);
+    await page.keyboard.up('Control');
+    await expect
+      .poll(() =>
+        page.locator('.document-sheet').evaluate((el) => el.getBoundingClientRect().width),
+      )
+      .toBeGreaterThan(paperWidth);
+    expect(
+      await app.evaluate(({ BrowserWindow }) =>
+        BrowserWindow.getAllWindows()[0].webContents.getZoomFactor(),
+      ),
+    ).toBe(1);
+    await page.getByRole('button', { name: 'Sayfayı %100 göster' }).click();
+
     const result = await page.evaluate(async () => {
       const recent = await window.desktop!.recents();
       const file = await window.desktop!.read(recent.find((r) => r.name === 'Belge.md')!.id);

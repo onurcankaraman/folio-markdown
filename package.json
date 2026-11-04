@@ -162,5 +162,6 @@
   "overrides": {
     "katex": "0.19.1"
   },
-  "desktopName": "folio-markdown.desktop"
+  "desktopName": "folio-markdown.desktop",
+  "homepage": "https://onurcankaraman.github.io/folio-markdown/"
 }

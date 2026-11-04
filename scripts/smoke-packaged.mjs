@@ -26,6 +26,15 @@ try {
   const info = await page.evaluate(() => window.desktop.info());
   if (!info.packaged) throw new Error('Packaged app expected');
   await page.getByRole('heading', { name: 'Paket testi', exact: true }).waitFor();
+  const width = await page
+    .locator('.document-sheet')
+    .evaluate((sheet) => sheet.getBoundingClientRect().width);
+  await page.getByRole('slider', { name: 'Sayfa yakınlaştırma', exact: true }).fill('200');
+  const zoomedWidth = await page
+    .locator('.document-sheet')
+    .evaluate((sheet) => sheet.getBoundingClientRect().width);
+  if (Math.abs(zoomedWidth - width * 2) > 1) throw new Error('Packaged page zoom failed');
+  await page.getByRole('button', { name: 'Sayfayı %100 göster' }).click();
   const drawing = await page.evaluate(() =>
     window.desktop.renderDiagram('flowchart LR\n n1["Paket"] --> n2["Çalışıyor"]', 'diagram-8000'),
   );
@@ -87,6 +96,7 @@ try {
         ...info,
         tests: [
           'real-file-open',
+          'whole-page-zoom',
           'isolated-diagram',
           'worker-zip-import',
           'atomic-save',

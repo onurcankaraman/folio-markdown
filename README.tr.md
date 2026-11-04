@@ -2,6 +2,8 @@
 
 # Folio
 
+**[Web sitesi](https://onurcankaraman.github.io/folio-markdown/) · [Uygulamayı indir](https://github.com/onurcankaraman/folio-markdown/releases/latest)**
+
 **Markdown belgelerini kod bilmeden oku, düzenle ve yanında taşı.**
 
 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md)

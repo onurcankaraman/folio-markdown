@@ -1,3 +1,4 @@
+import { useDocumentZoom } from './hooks/useDocumentZoom';
 import { useT, setUILanguage, translate } from './ui';
 import { useCallback, useEffect, useRef, useState, lazy, Suspense, type ReactNode } from 'react';
 import { EditorView as CodeMirrorView } from '@codemirror/view';
@@ -242,6 +243,11 @@ export default function App() {
     } | null>(null),
     [fileName, setFileName] = useState(''),
     [treeRevision, setTreeRevision] = useState(0);
+  const pageZoom = useDocumentZoom(
+    mode !== 'source',
+    settings.width + 100,
+    !!dialog || !!block || !!confirm,
+  );
   const closedTabs = useRef<Tab[]>([]);
   const histories = useRef(new Map<string, DocumentHistory>());
   const sourceView = useRef<CodeMirrorView | null>(null),
@@ -1635,60 +1641,63 @@ export default function App() {
             )}
             <div
               className="document-scroll"
+              ref={pageZoom.viewport}
               onScroll={previewScrolled}
               style={{ display: mode === 'source' ? 'none' : undefined }}
             >
-              <div className="document-sheet">
-                <div className="document-meta">
-                  <span className="document-tag">
-                    <span className="tiny-dot" />{' '}
-                    {active.id === 'welcome' ? 'BAŞLANGIÇ REHBERİ' : 'MARKDOWN BELGESİ'}
-                  </span>
-                  <span>
-                    <Clock3 size={12} /> {readMinutes} {ui('dk okuma')}
-                  </span>
-                </div>
-                <Suspense fallback={<p className="muted">{ui('Editör hazırlanıyor…')}</p>}>
-                  {mode === 'edit' && (
-                    <VisualEditor
-                      key={active.id}
+              <div className="document-canvas">
+                <div className="document-sheet" style={{ zoom: pageZoom.percent / 100 }}>
+                  <div className="document-meta">
+                    <span className="document-tag">
+                      <span className="tiny-dot" />{' '}
+                      {active.id === 'welcome' ? 'BAŞLANGIÇ REHBERİ' : 'MARKDOWN BELGESİ'}
+                    </span>
+                    <span>
+                      <Clock3 size={12} /> {readMinutes} {ui('dk okuma')}
+                    </span>
+                  </div>
+                  <Suspense fallback={<p className="muted">{ui('Editör hazırlanıyor…')}</p>}>
+                    {mode === 'edit' && (
+                      <VisualEditor
+                        key={active.id}
+                        source={active.source}
+                        documentId={active.id}
+                        onChange={(s) => update(active.id, s)}
+                        onReady={(e) => {
+                          if (editor.current !== e) {
+                            editor.current = e;
+                            const selection = visualSelections.current.get(active.id);
+                            if (selection)
+                              requestAnimationFrame(() => {
+                                if (!e.isDestroyed)
+                                  e.commands.setTextSelection({
+                                    from: Math.min(selection.from, e.state.doc.content.size),
+                                    to: Math.min(selection.to, e.state.doc.content.size),
+                                  });
+                              });
+                          }
+                          forceRender((n) => n + 1);
+                        }}
+                      />
+                    )}
+                  </Suspense>
+                  {mode !== 'edit' && (
+                    <Preview
                       source={active.source}
                       documentId={active.id}
-                      onChange={(s) => update(active.id, s)}
-                      onReady={(e) => {
-                        if (editor.current !== e) {
-                          editor.current = e;
-                          const selection = visualSelections.current.get(active.id);
-                          if (selection)
-                            requestAnimationFrame(() => {
-                              if (!e.isDestroyed)
-                                e.commands.setTextSelection({
-                                  from: Math.min(selection.from, e.state.doc.content.size),
-                                  to: Math.min(selection.to, e.state.doc.content.size),
-                                });
-                            });
-                        }
-                        forceRender((n) => n + 1);
-                      }}
+                      onDiagramEdit={editDiagram}
                     />
                   )}
-                </Suspense>
-                {mode !== 'edit' && (
-                  <Preview
-                    source={active.source}
-                    documentId={active.id}
-                    onDiagramEdit={editDiagram}
-                  />
-                )}
-                {!active.source && (
-                  <div className="empty-document">
-                    <Sparkles size={27} />
-                    <p>{ui('Yeni bir düşünceye yer aç.')}</p>
-                    <span>{ui('Yazmaya başla veya Ekle menüsünden bir blok seç.')}</span>
+                  {!active.source && (
+                    <div className="empty-document">
+                      <Sparkles size={27} />
+                      <p>{ui('Yeni bir düşünceye yer aç.')}</p>
+                      <span>{ui('Yazmaya başla veya Ekle menüsünden bir blok seç.')}</span>
+                    </div>
+                  )}
+                  <div className="document-end">
+                    <span /> <BookOpen size={13} /> <span />
                   </div>
-                )}
-                <div className="document-end">
-                  <span /> <BookOpen size={13} /> <span />
                 </div>
               </div>
             </div>
@@ -1717,12 +1726,15 @@ export default function App() {
               </span>
               <span className="status-separator" />
               <span>{ui('Markdown')}</span>
-              <button title={ui('Yakınlaştırmayı sıfırla')} onClick={() => setZoom(100)}>
+              <span aria-hidden="true" title={ui('Yazı boyutu ölçeği')}>
+                Aa
+              </span>
+              <button title={ui('Yazı boyutunu sıfırla')} onClick={() => setZoom(100)}>
                 {zoom}
                 {ui('%')}
               </button>
               <input
-                aria-label={ui('Belge yakınlaştırma')}
+                aria-label={ui('Yazı boyutu ölçeği')}
                 type="range"
                 min="50"
                 max="200"
@@ -1730,6 +1742,54 @@ export default function App() {
                 value={zoom}
                 onChange={(e) => setZoom(+e.target.value)}
               />
+              <span className="status-separator" />
+              <div
+                className="page-zoom-controls"
+                role="group"
+                aria-label={ui('Sayfa yakınlaştırma')}
+              >
+                <button
+                  disabled={mode === 'source'}
+                  title={ui('Genişliğe sığdır')}
+                  aria-pressed={pageZoom.fitted}
+                  onClick={pageZoom.fit}
+                >
+                  <Maximize2 size={12} />
+                </button>
+                <button
+                  disabled={mode === 'source' || pageZoom.percent <= 25}
+                  aria-label={ui('Sayfayı uzaklaştır')}
+                  onClick={() => pageZoom.zoom(pageZoom.percent - 10)}
+                >
+                  <Minus size={12} />
+                </button>
+                <input
+                  aria-label={ui('Sayfa yakınlaştırma')}
+                  type="range"
+                  min="25"
+                  max="300"
+                  step="1"
+                  disabled={mode === 'source'}
+                  value={pageZoom.percent}
+                  onChange={(e) => pageZoom.zoom(+e.target.value)}
+                />
+                <button
+                  disabled={mode === 'source' || pageZoom.percent >= 300}
+                  aria-label={ui('Sayfayı yakınlaştır')}
+                  onClick={() => pageZoom.zoom(pageZoom.percent + 10)}
+                >
+                  <Plus size={12} />
+                </button>
+                <button
+                  disabled={mode === 'source'}
+                  className="page-zoom-value"
+                  title={ui('Sayfayı %100 göster')}
+                  aria-label={ui('Sayfayı %100 göster')}
+                  onClick={() => pageZoom.zoom(100)}
+                >
+                  {Math.round(pageZoom.percent)}%
+                </button>
+              </div>
               <button title={ui('Görünümü genişlet')} onClick={() => setFocus(!focus)}>
                 <Maximize2 size={12} />
               </button>
@@ -2406,8 +2466,17 @@ export default function App() {
                 'Ekle menüsünde tablolar, sembollerle oluşturulan formüller, 16 diyagram türü, dipnotlar ve bilgi kutuları var. Formül veya diyagrama çift tıklayarak yeniden düzenleyebilirsin.',
               )}
             </p>
+            <h3>{ui('Sayfa yakınlaştırma')}</h3>
+            <p>
+              {ui(
+                'İki parmakla sıkıştırıp açarak sayfayı yakınlaştır. İki parmakla yatay ve dikey kaydır. Ctrl veya ⌘ ile tekerlek de yakınlaştırır. Alt çubukta yazı boyutu ve sayfa ölçeği ayrıdır; genişliğe sığdırabilir veya %100’e dönebilirsin.',
+              )}
+            </p>
             <div className="shortcut-list">
               {[
+                ['Sayfayı yakınlaştır', '⌘ / Ctrl + +'],
+                ['Sayfayı uzaklaştır', '⌘ / Ctrl + −'],
+                ['Sayfayı %100 göster', '⌘ / Ctrl + 0'],
                 ['Yeni belge', '⌘ / Ctrl + N'],
                 ['Dosya aç', '⌘ / Ctrl + O'],
                 ['Kaydet', '⌘ / Ctrl + S'],

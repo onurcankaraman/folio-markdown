@@ -8,7 +8,15 @@ export function setUILanguage(next: 'tr' | 'en') {
     listeners.forEach((f) => f());
   }
 }
-const pairs = `düşüncelerine yer aç.=make room for your thoughts.
+const pairs = `Yazı boyutunu sıfırla=Reset text size
+Yazı boyutu ölçeği=Text size scale
+Sayfa yakınlaştırma=Page zoom
+Genişliğe sığdır=Fit to width
+Sayfayı uzaklaştır=Zoom page out
+Sayfayı yakınlaştır=Zoom page in
+Sayfayı %100 göster=Show page at 100%
+İki parmakla sıkıştırıp açarak sayfayı yakınlaştır. İki parmakla yatay ve dikey kaydır. Ctrl veya ⌘ ile tekerlek de yakınlaştırır. Alt çubukta yazı boyutu ve sayfa ölçeği ayrıdır; genişliğe sığdırabilir veya %100’e dönebilirsin.=Pinch with two fingers to zoom the page. Scroll horizontally and vertically with two fingers. Ctrl or ⌘ with the wheel also zooms. Text size and page scale are separate in the footer; fit to width or return to 100%.
+düşüncelerine yer aç.=make room for your thoughts.
 YEREL ÇALIŞMA ALANI=LOCAL WORKSPACE
 Paneli gizle=Hide sidebar
 Yeni belge=New document

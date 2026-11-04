@@ -25,7 +25,8 @@ const failure = (e: any) => ({
 });
 
 export function createServer(workspace: string) {
-  const root = realpathSync(workspace);
+  // Match promises.realpath, which uses the native resolver on Windows too.
+  const root = realpathSync.native(workspace);
   const relative = (file: string) => path.relative(root, file).split(path.sep).join('/');
   async function resolve(name: string) {
     if (!markdown.test(name)) throw new Error('Only .md and .markdown files are supported.');

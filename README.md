@@ -2,6 +2,8 @@
 
 # Folio
 
+**[Website](https://onurcankaraman.github.io/folio-markdown/) · [Download Folio](https://github.com/onurcankaraman/folio-markdown/releases/latest)**
+
 **Read, edit and carry your Markdown documents without writing code.**
 
 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md)

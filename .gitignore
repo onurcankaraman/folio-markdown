@@ -17,3 +17,5 @@ playwright-report/
 *.key
 build/THIRD_PARTY_LICENSES.txt
 build/Folio.iconset/
+
+site-dist/

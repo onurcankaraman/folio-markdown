@@ -777,7 +777,8 @@ kbd {
   flex: 1;
   min-width: 0;
   overflow: auto;
-  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  overflow-anchor: none;
   scrollbar-color: #d3d7c9 transparent;
   scrollbar-width: thin;
   background: var(--bg);
@@ -2577,4 +2578,65 @@ textarea::placeholder {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* The canvas grows in both axes; auto margins center only while paper fits. */
+.document-canvas {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+  padding: 32px 24px 60px;
+}
+.document-canvas > .document-sheet {
+  box-sizing: border-box;
+  width: calc(var(--document-width) + 100px);
+  max-width: none;
+  min-height: 900px;
+  margin: 0 auto;
+  padding: 41px 57px 24px;
+}
+.page-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.page-zoom-controls .page-zoom-value {
+  min-width: 35px;
+  justify-content: center;
+}
+.page-zoom-controls button[aria-pressed='true'] {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.page-zoom-controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.statusbar > div:first-child {
+  min-width: 0;
+  overflow: hidden;
+}
+.statusbar > div:last-child {
+  flex-shrink: 0;
+}
+@media (max-width: 1100px) {
+  .statusbar > div:first-child {
+    display: none;
+  }
+  .statusbar {
+    justify-content: flex-end;
+  }
+}
+
+.page-zoom-controls button {
+  min-width: 22px;
+  min-height: 22px;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+.statusbar {
+  height: 36px;
+  min-height: 36px;
 }

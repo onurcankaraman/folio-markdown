@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Folio — Düşüncelerine yer aç.</title>
+    <meta
+      name="description"
+      content="Markdown belgelerini kod bilmeden oku, düzenle ve yanında taşı. Tablolar, matematik ve diyagramlar için yerel masaüstü editörü."
+    />
+    <meta name="theme-color" content="#f6f5ef" />
+    <meta property="og:title" content="Folio — Düşüncelerine yer aç." />
+    <meta
+      property="og:description"
+      content="Markdown için sakin bir çalışma alanı. macOS, Windows ve Linux."
+    />
+    <meta
+      property="og:image"
+      content="https://onurcankaraman.github.io/folio-markdown/assets/folio-light.png"
+    />
+    <link rel="canonical" href="https://onurcankaraman.github.io/folio-markdown/" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">İçeriğe geç</a>
+    <header class="nav wrap">
+      <a class="brand" href="#" aria-label="Folio ana sayfa"
+        ><img src="assets/favicon.svg" alt="" width="32" height="32" />folio<span>.</span></a
+      >
+      <nav aria-label="Ana menü">
+        <a href="#ozellikler">Neler yapar?</a><a href="#indir">İndir</a
+        ><a class="github" href="https://github.com/onurcankaraman/folio-markdown">GitHub ↗</a>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero wrap">
+        <div class="eyebrow"><span></span> SENİN BELGELERİN. SENİN ALANIN.</div>
+        <h1>Düşüncelerine<br /><em>yer aç.</em></h1>
+        <p class="lead">
+          Markdown’ın sadeliği, bir belgenin rahatlığı.<br />Oku, görsel olarak düzenle ve dosyanı
+          yanında taşı.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="#indir"
+            >Folio’yu indir <span aria-hidden="true">↓</span></a
+          ><a class="text-link" href="#kesfet"
+            >İçerisine göz at <span aria-hidden="true">↗</span></a
+          >
+        </div>
+        <p class="platforms">macOS · Windows · Linux <span> / </span> Hesap gerektirmez</p>
+      </section>
+      <section class="showcase wrap" id="kesfet" aria-label="Folio ekran görüntüsü">
+        <div class="window-top">
+          <span class="dots" aria-hidden="true">● ● ●</span
+          ><span>Küçük bir fikirden, büyük resme.</span>
+          <div class="theme-switch" role="group" aria-label="Ekran görüntüsü teması">
+            <button data-theme="light" aria-pressed="true">Açık</button
+            ><button data-theme="dark" aria-pressed="false">Koyu</button>
+          </div>
+        </div>
+        <img
+          id="app-shot"
+          src="assets/folio-light.png"
+          alt="Folio masaüstü uygulaması: yan panel, okuma ve düzenleme araçları, tablo ve diyagram içeren Markdown belgesi"
+          width="1440"
+          height="1000"
+          fetchpriority="high"
+        />
+        <div class="image-caption">
+          <span>Bir dosya aç. Gerisi düşüncelerine kalsın.</span
+          ><span>GERÇEK UYGULAMA GÖRÜNTÜSÜ</span>
+        </div>
+      </section>
+      <section class="intro wrap" id="ozellikler">
+        <p class="eyebrow">AZ SÖZDİZİMİ. DAHA ÇOK FİKİR.</p>
+        <h2>Bir belge kadar tanıdık.<br />Markdown kadar esnek.</h2>
+        <p>
+          Notlarından teknik dokümanlarına kadar, içeriğini tek bir çalışma alanında bir araya
+          getir. İstersen Markdown kaynağına da her an geç.
+        </p>
+      </section>
+      <section class="features wrap" aria-label="Özellikler">
+        <article>
+          <span class="feature-no">01 / YAZ</span>
+          <h3>Kod bilmeden<br />bir şeyler anlat.</h3>
+          <p>
+            Başlıklar, listeler, alıntılar ve görseller. Metne tıklayıp yaz; görsel, kaynak ve
+            bölünmüş görünümler arasında geç.
+          </p>
+          <div class="mini-paper">
+            <strong>Bugünün küçük planı</strong><span>☑ Bir fikir yakala</span
+            ><span>☐ Üzerine bir şeyler ekle</span><span>☐ Dünyayla paylaş</span>
+          </div>
+        </article>
+        <article>
+          <span class="feature-no">02 / OLUŞTUR</span>
+          <h3>Karmaşık fikirleri<br />görünür kıl.</h3>
+          <p>
+            Görsel tablo araçları, LaTeX formülleri ve Mermaid diyagramları. CSV içe aktar,
+            matematiği düzenle, akışı birlikte gör.
+          </p>
+          <div class="mini-flow" aria-label="Fikirden taslağa, taslaktan belgeye">
+            <span>Fikir</span><b>→</b><span>Taslak</span><b>→</b><span>Belge</span>
+          </div>
+          <div class="formula" aria-label="E eşittir m c kare">E = mc²</div>
+        </article>
+        <article>
+          <span class="feature-no">03 / ODAKLAN</span>
+          <h3>Sayfaya yaklaş.<br />Büyük resmi kaybetme.</h3>
+          <p>
+            Trackpad’de iki parmakla yakınlaştır. Sayfayı yatay ve dikey kaydır, genişliğe sığdır.
+            Yazı boyutu ve sayfa ölçeğini ayrı ayarla.
+          </p>
+          <div class="zoom-demo" aria-hidden="true">
+            <span>−</span>
+            <div><i></i></div>
+            <span>+</span><b>150%</b>
+          </div>
+        </article>
+        <article>
+          <span class="feature-no">04 / YANINDA TAŞI</span>
+          <h3>Dosyaların her zaman<br />sana ait.</h3>
+          <p>
+            Yerel Markdown dosyalarıyla çalış. PDF, bağımsız HTML veya görselleriyle ZIP olarak
+            paylaş. Geçmiş, kurtarma ve harici değişiklik uyarılarıyla çalışmana devam et.
+          </p>
+          <div class="file-types">
+            <span>.md</span><span>.pdf</span><span>.html</span><span>.zip</span>
+          </div>
+        </article>
+      </section>
+      <section class="local wrap">
+        <div class="local-icon" aria-hidden="true">↳</div>
+        <div>
+          <p class="eyebrow">YEREL ÖNCELİKLİ</p>
+          <h2>Dosyaların sende.<br />Kontrol de öyle.</h2>
+        </div>
+        <p>
+          Belgelerini düzenlemek için üyelik veya uygulama sunucusu gerekmez. Dosyalarını kendi
+          klasörlerinde sakla; yedekleme ve paylaşma yöntemini sen seç.
+        </p>
+      </section>
+      <section class="downloads wrap" id="indir">
+        <div class="download-heading">
+          <div>
+            <p class="eyebrow">YENİ BİR SAYFA AÇ</p>
+            <h2>Folio’yu yanında taşı.</h2>
+          </div>
+          <a
+            id="release-link"
+            class="text-link"
+            href="https://github.com/onurcankaraman/folio-markdown/releases"
+            >Sürüm notları ↗</a
+          >
+        </div>
+        <p id="release-status" role="status">Paketler için GitHub sürümlerine göz atabilirsin.</p>
+        <div class="download-grid">
+          <article>
+            <span class="os-symbol" aria-hidden="true">⌘</span>
+            <h3>macOS</h3>
+            <p>Apple Silicon ve Intel</p>
+            <div class="download-links" data-platform="mac">
+              <a href="https://github.com/onurcankaraman/folio-markdown/releases"
+                >macOS paketlerini gör ↗</a
+              >
+            </div>
+          </article>
+          <article>
+            <span class="os-symbol" aria-hidden="true">⊞</span>
+            <h3>Windows</h3>
+            <p>x64 ve ARM64 · Kurulum & Portable</p>
+            <div class="download-links" data-platform="windows">
+              <a href="https://github.com/onurcankaraman/folio-markdown/releases"
+                >Windows paketlerini gör ↗</a
+              >
+            </div>
+          </article>
+          <article>
+            <span class="os-symbol" aria-hidden="true">$</span>
+            <h3>Linux</h3>
+            <p>x64 ve ARM64 · AppImage & DEB</p>
+            <div class="download-links" data-platform="linux">
+              <a href="https://github.com/onurcankaraman/folio-markdown/releases"
+                >Linux paketlerini gör ↗</a
+              >
+            </div>
+          </article>
+        </div>
+        <p class="release-note">
+          İlk dağıtım paketleri imzasızdır; işletim sistemin yayıncı doğrulama uyarısı gösterebilir.
+          Ayrıntılar ve dosya bütünlüğü özetleri sürüm sayfasındadır. Tam üretim kabulü halen
+          sürmektedir.
+        </p>
+      </section>
+      <section class="faq wrap">
+        <h2>Aklındaki birkaç şey.</h2>
+        <div>
+          <details>
+            <summary>Markdown bilmem gerekiyor mu?</summary>
+            <p>
+              Hayır. Dosyanı açıp Düzenle görünümünde metne tıklayarak yazabilirsin. Tablolar,
+              matematik ve diyagramlar için görsel araçlar var. İstersen Kaynak görünümünde
+              Markdown’ı doğrudan düzenleyebilirsin.
+            </p>
+          </details>
+          <details>
+            <summary>İnternet olmadan çalışır mı?</summary>
+            <p>
+              Yerel belgeleri okuma ve düzenleme, uygulamayla gelen formül ve diyagram araçları
+              çevrimdışı çalışır. Harici bağlantılar ve kullanıcı tarafından başlatılan güncelleme
+              kontrolleri ağ bağlantısı gerektirebilir.
+            </p>
+          </details>
+          <details>
+            <summary>Hangi paketi indirmeliyim?</summary>
+            <p>
+              Mac’te Apple Silicon veya Intel işlemcine uygun DMG’yi seç. Windows’ta Setup kurulum
+              yapar, Portable kurulum gerektirmeden çalışır. Linux’ta AppImage veya DEB paketini,
+              cihazının x64/ARM64 mimarisine göre seç.
+            </p>
+          </details>
+          <details>
+            <summary>Katkı sağlayabilir miyim?</summary>
+            <p>
+              Hata bildirimlerini ve önerilerini
+              <a href="https://github.com/onurcankaraman/folio-markdown/issues">GitHub Issues</a>
+              üzerinden paylaşabilirsin. Kod katkısından önce depodaki katkı rehberini ve lisans
+              durumunu incele.
+            </p>
+          </details>
+        </div>
+      </section>
+    </main>
+    <footer class="wrap footer">
+      <a class="brand" href="#">folio<span>.</span></a>
+      <p>Düşün. Yaz. Yanında taşı.</p>
+      <a href="https://github.com/onurcankaraman/folio-markdown">GitHub ↗</a
+      ><a href="https://github.com/onurcankaraman">Onur Can Karaman ↗</a>
+    </footer>
+  </body>
+</html>
