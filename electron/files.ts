@@ -90,3 +90,45 @@ export const inside = (root: string, file: string) => {
   const rel = path.relative(root, file);
   return !rel.startsWith('..' + path.sep) && rel !== '..' && !path.isAbsolute(rel);
 };
+
+export const isMarkdownName = (name: string) => /\.(md|markdown)$/i.test(name);
+const visibleEntries = async (dir: string) =>
+  (await fs.readdir(dir, { withFileTypes: true }).catch(() => [])).filter(
+    (f) =>
+      !f.name.startsWith('.') &&
+      !['node_modules', 'dist', 'release'].includes(f.name) &&
+      !f.isSymbolicLink(),
+  );
+// Stops at the first Markdown file. When the scan budget runs out the folder
+// is shown anyway, so a very large tree never hides real notes.
+async function containsMarkdown(dir: string, budget: { left: number }): Promise<boolean> {
+  const subdirs: string[] = [];
+  for (const f of await visibleEntries(dir)) {
+    if (--budget.left < 0) return true;
+    if (f.isFile() && isMarkdownName(f.name)) return true;
+    if (f.isDirectory()) subdirs.push(path.join(dir, f.name));
+  }
+  for (const sub of subdirs) if (await containsMarkdown(sub, budget)) return true;
+  return false;
+}
+/** One level of the folder tree: Markdown files, plus folders that hold Markdown
+ *  somewhere below them or are completely empty (so a new folder stays visible). */
+export async function markdownEntries(dir: string) {
+  const items = await visibleEntries(dir);
+  const shown = await Promise.all(
+    items.map(async (f) => {
+      const full = path.join(dir, f.name);
+      if (f.isFile()) return isMarkdownName(f.name);
+      if (!f.isDirectory()) return false;
+      return (
+        (await visibleEntries(full)).length === 0 || (await containsMarkdown(full, { left: 5000 }))
+      );
+    }),
+  );
+  return items
+    .filter((_, i) => shown[i])
+    .sort(
+      (a, b) => Number(b.isDirectory()) - Number(a.isDirectory()) || a.name.localeCompare(b.name),
+    )
+    .map((f) => ({ name: f.name, path: path.join(dir, f.name), directory: f.isDirectory() }));
+}

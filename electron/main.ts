@@ -5,7 +5,15 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { atomicSave, ConflictError, decode, decodePath, hash, inside } from './files.js';
+import {
+  atomicSave,
+  ConflictError,
+  decode,
+  decodePath,
+  hash,
+  inside,
+  markdownEntries,
+} from './files.js';
 import { relocateAssets } from './assets.js';
 import updater from 'electron-updater';
 import { parse as parseYAML } from 'yaml';
@@ -216,18 +224,11 @@ async function openPaths(paths: string[]) {
   return files;
 }
 async function entries(dir: string) {
-  return (await fs.readdir(dir, { withFileTypes: true }))
-    .filter(
-      (f) =>
-        !f.name.startsWith('.') &&
-        !['node_modules', 'dist', 'release'].includes(f.name) &&
-        !f.isSymbolicLink() &&
-        (f.isDirectory() || /\.(md|markdown)$/i.test(f.name)),
-    )
-    .sort(
-      (a, b) => Number(b.isDirectory()) - Number(a.isDirectory()) || a.name.localeCompare(b.name),
-    )
-    .map((f) => ({ id: grant(path.join(dir, f.name)), name: f.name, directory: f.isDirectory() }));
+  return (await markdownEntries(dir)).map((f) => ({
+    id: grant(f.path),
+    name: f.name,
+    directory: f.directory,
+  }));
 }
 function handlers() {
   const handle = (channel: string, fn: (...args: any[]) => any) =>
